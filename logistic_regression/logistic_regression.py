@@ -59,16 +59,16 @@ class LogisticRegressionGD:
         rng = default_rng(self.random_state)
         self.w_ = rng.uniform(-1e-2, 1e-2, size=X.shape[1])
         self.b_ = rng.uniform(-1e-2, 1e-2)
-        n_sample = X.shape[0]
+        n = X.shape[0]
         J_last, J_old = None, None
-        for i in range(self.n_iter):
+        for _ in range(self.n_iter):
             z = self.net_input(X)
             sigmoid = self.sigmoid(z)
             errors = y - sigmoid
-            self.w_ += self.eta * (X.T @ errors)
-            self.b_ += self.eta * errors.sum()
-            J_last = - (1 / n_sample) * np.sum(y * np.log(sigmoid) + (1 - y) * np.log(1 - sigmoid))
-            if i != 0 and np.abs(J_last - J_old) <= self.eps:
+            self.w_ += self.eta * (X.T @ errors) / n
+            self.b_ += self.eta * errors.sum() / n
+            J_last = - (1 / n) * np.sum(y * np.log(sigmoid) + (1 - y) * np.log(1 - sigmoid))
+            if J_old is not None and np.abs(J_last - J_old) <= self.eps:
                 break
             J_old = J_last
         return self

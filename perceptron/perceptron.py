@@ -1,5 +1,6 @@
 from numpy.random import default_rng
 import numpy as np
+from ._validators import validation_params, validation_fit, validation_predict
 
 
 class Perceptron:
@@ -21,6 +22,7 @@ class Perceptron:
     b_ : float
         Bias after fitting."""
 
+    @validation_params
     def __init__(
             self,
             learning_rate: float = .1,
@@ -63,6 +65,7 @@ class Perceptron:
         z = X @ self.w_ + self.b_
         return z
 
+    @validation_fit
     def fit(self, X: np.ndarray, y: np.ndarray, /) -> 'Perceptron':
         """
         Fit the Perceptron model to the training data.
@@ -79,8 +82,6 @@ class Perceptron:
         self : Perceptron
         """
 
-        if not np.all(np.isin(np.unique(y), [1, -1])):
-            raise ValueError('Target values must be -1 or 1 for Perceptron')
         self.initialize_weights_bias(X.shape[1])
         for i in range(self.n_iter):
             pred = self.predict(X)
@@ -93,6 +94,7 @@ class Perceptron:
                 break
         return self
 
+    @validation_predict
     def predict(self, X: np.ndarray, /) -> np.ndarray:
         """Predict class labels for input samples.
 
