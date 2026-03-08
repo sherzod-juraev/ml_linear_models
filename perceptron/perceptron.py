@@ -33,6 +33,7 @@ class Perceptron:
         self.eta = learning_rate
         self.n_iter = n_iter
         self.random_state = random_state
+        self.fitted_ = False
 
 
     def initialize_weights_bias(self, size: int):
@@ -92,6 +93,7 @@ class Perceptron:
                 self.b_ += self.eta * err.sum()
             else:
                 break
+        self.fitted_ = True
         return self
 
     @validation_predict
@@ -108,7 +110,8 @@ class Perceptron:
         np.ndarray
             Predicted labels (-1 or 1), shape (n_samples,)
         """
-
+        if not self.fitted_:
+            raise Exception('Perceptron not fitted yet')
         z = self.net_input(X)
         pred = np.where(z >= 0, 1, -1)
         return pred

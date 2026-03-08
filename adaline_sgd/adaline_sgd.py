@@ -1,5 +1,6 @@
 from numpy.random import default_rng
 import numpy as np
+from ._validator import validation_params, validation_fit, validation_predict
 
 
 class AdalineSGD:
@@ -24,6 +25,7 @@ class AdalineSGD:
         Bias after fitting.
     """
 
+    @validation_params
     def __init__(
             self,
             eta: float = 1e-2,
@@ -35,7 +37,9 @@ class AdalineSGD:
         self.n_iter = n_iter
         self.eps = eps
         self.random_state = random_state
+        self.fitted_ = False
 
+    @validation_fit
     def fit(self, X: np.ndarray, y: np.ndarray, /) -> 'AdalineSGD':
         """Fit training data using stochastic gradient descent.
 
@@ -69,6 +73,7 @@ class AdalineSGD:
                 J_last += (error ** 2) / 2
             if i != 0 and np.abs(J_last - J_old) <= self.eps:
                 break
+        self.fitted_ = True
         return self
 
 
@@ -89,6 +94,7 @@ class AdalineSGD:
         net_input = xi @ self.w_ + self.b_
         return net_input
 
+    @validation_predict
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Return class labels after unit step function.
 
@@ -102,6 +108,7 @@ class AdalineSGD:
         np.ndarray
             Predicted labels (-1 or 1) for each sample.
         """
-
+        if not self.fitted_:
+            raise Exception("AdalineSGD not fitted yet")
         result = np.where(self.net_input(X) > 0, 1, -1)
         return result

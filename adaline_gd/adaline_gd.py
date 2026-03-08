@@ -1,5 +1,6 @@
 from numpy.random import default_rng
 import numpy as np
+from ._validator import validation_params, validation_fit, validation_predict
 
 
 class AdalineGD:
@@ -24,6 +25,7 @@ class AdalineGD:
         Bias after fitting.
     """
 
+    @validation_params
     def __init__(
             self,
             eta: float = 1e-2,
@@ -36,8 +38,9 @@ class AdalineGD:
         self.n_iter = n_iter
         self.eps = eps
         self.random_state = random_state
+        self.fitted_ = False
 
-
+    @validation_fit
     def fit(self, X: np.ndarray, y: np.ndarray, /) -> 'AdalineGD':
         """Fit training data using batch gradient descent.
 
@@ -68,6 +71,7 @@ class AdalineGD:
             if i != 0 and np.abs(J_last - J_old) < self.eps:
                 break
             J_old = J_last
+        self.fitted_ = True
         return self
 
     def net_input(self, X: np.ndarray) -> np.ndarray:
@@ -85,6 +89,7 @@ class AdalineGD:
 
         return X @ self.w_ + self.b_
 
+    @validation_predict
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Return class label after unit step.
 
@@ -97,5 +102,7 @@ class AdalineGD:
         np.ndarray
             Predicted labels (-1 or 1)
         """
+        if not self.fitted_:
+            raise Exception("AdalineGD not fitted yet")
         net_input = self.net_input(X)
         return np.where(net_input >= 0, 1, -1)
