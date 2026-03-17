@@ -85,7 +85,8 @@ class Perceptron:
 
         self.initialize_weights_bias(X.shape[1])
         for i in range(self.n_iter):
-            pred = self.predict(X)
+            z = self.net_input(X)
+            pred = np.where(z >= 0, 1, -1)
             err = y - pred
             ind = err == 0
             if not np.all(ind):
